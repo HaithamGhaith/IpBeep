@@ -1,5 +1,4 @@
 import React from 'react';
-import NotificationsIcon from '@mui/icons-material/Notifications';
 import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
@@ -21,9 +20,17 @@ const iconButtonStyle = {
   color: '#1a237e',
 };
 
-const Navbar = ({ course, section }) => {
+const Navbar = ({ course, section, isCoursesPage, isRunningSessionPage }) => {
   const navigate = useNavigate();
   const { colors } = useTheme();
+
+  const navbarTitle = isRunningSessionPage 
+    ? ` - Running Session ${course ? course.toUpperCase() : ''}`
+    : isCoursesPage 
+      ? ' - Current Courses' 
+      : course && section 
+        ? ` - ${course.toUpperCase()} Session ${section} Report` 
+        : ' - Dashboard - Report';
 
   return (
     <header style={{
@@ -61,7 +68,7 @@ const Navbar = ({ course, section }) => {
               fontFamily: "'Outfit', sans-serif",
               letterSpacing: 1
             }}>
-              IPBeep{course && section ? ` - ${course.toUpperCase()} Section ${section}` : ' - Dashboard'}
+              IPBeep{navbarTitle}
             </span>
           </div>
           <div style={{ 
@@ -69,14 +76,6 @@ const Navbar = ({ course, section }) => {
             alignItems: 'center', 
             gap: 16
           }}>
-            <button
-              type="button"
-              style={iconButtonStyle}
-              onMouseOver={e => e.currentTarget.style.backgroundColor = '#e8eaf6'}
-              onMouseOut={e => e.currentTarget.style.backgroundColor = '#f5f7ff'}
-            >
-              <NotificationsIcon style={{ color: '#1a237e' }} />
-            </button>
             <button
               type="button"
               style={iconButtonStyle}
@@ -98,16 +97,10 @@ const Navbar = ({ course, section }) => {
               cursor: 'pointer',
               transition: 'all 0.2s ease-in-out',
             }}
-            onMouseOver={e => {
-                e.currentTarget.style.transform = 'scale(1.05)';
-                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
-              }}
-              onMouseOut={e => {
-                e.currentTarget.style.transform = '';
-                e.currentTarget.style.boxShadow = '';
-              }}
+            onMouseOver={e => e.currentTarget.style.backgroundColor = '#d0d0d0'}
+            onMouseOut={e => e.currentTarget.style.backgroundColor = '#e0e0e0'}
             >
-             <AccountCircleIcon style={{ fontSize: 30, color: '#546e7a' }} />
+              <AccountCircleIcon style={{ color: '#1a237e' }} />
             </div>
           </div>
         </div>

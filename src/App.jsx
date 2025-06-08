@@ -5,6 +5,7 @@ import SignInPage from './pages/SignInPage';
 import DashboardPage from './pages/DashboardPage'; // Re-import DashboardPage
 import CoursesPage from './pages/CoursesPage'; // Import CoursesPage
 import HelpPage from './pages/HelpPage';
+import RunningSessionPage from './pages/RunningSessionPage'; // Import RunningSessionPage
 // import Navbar from './components/Navbar'; // Assuming Navbar is not global anymore based on previous changes
 // import SettingsNav from './components/SettingsNav'; // Assuming SettingsNav is not global
 
@@ -23,6 +24,8 @@ function App() {
           <Route path="/courses" element={<CoursesPage />} />
           {/* After starting a session on Courses, go to Dashboard */}
           <Route path="/dashboard" element={<DashboardPage />} />
+          {/* After starting a session on Courses, go to Running Session */}
+          <Route path="/runningsession" element={<RunningSessionPage />} />
           {/* Keep help page or modify path if needed */}
           <Route path="/help" element={<HelpPage />} /> {/* Or change path if desired */}
         </Routes>

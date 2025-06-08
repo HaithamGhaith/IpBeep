@@ -119,7 +119,8 @@ const SignInPage = () => {
             onChange={(e) => setEmail(e.target.value)}
             required
             style={{
-              width: '100%',
+              margin: '0 auto',
+              width: '90%',
               padding: '12px',
               marginBottom: '16px',
               border: `1px solid ${colors.border}`,
@@ -130,6 +131,7 @@ const SignInPage = () => {
               color: colors.text,
               outline: 'none',
               transition: 'border-color 0.3s ease',
+              margin: '0 auto 16px auto',
             }}
           />
           <input 
@@ -139,7 +141,7 @@ const SignInPage = () => {
             onChange={(e) => setPassword(e.target.value)}
             required
             style={{
-              width: '100%',
+              width: '90%',
               padding: '12px',
               marginBottom: '24px',
               border: `1px solid ${colors.border}`,
@@ -150,13 +152,14 @@ const SignInPage = () => {
               color: colors.text,
               outline: 'none',
               transition: 'border-color 0.3s ease',
+              margin: '0 auto 24px auto',
             }}
           />
           <button 
             type="submit"
             disabled={isLoading}
             style={{
-              width: '100%',
+              width: '80%',
               padding: '12px',
               backgroundColor: isLoading ? '#6c757d' : '#1a237e',
               color: '#fff',
