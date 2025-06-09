@@ -246,3 +246,181 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ---
 
 Built with ❤️ for better education
+
+## 🔒 Security and Configuration
+
+### Firebase Security
+
+1. **Never commit Firebase credentials**
+   - Keep all Firebase configuration files out of version control
+   - Use environment variables for sensitive data
+   - Store Firebase credentials securely
+
+2. **Required Firebase files to keep private**
+   - `firebase.js` or `firebase.config.js`
+   - `firestore.rules`
+   - Any Firebase service account keys
+   - Firebase admin credentials
+
+3. **Setting up Firebase locally**
+   - Create a `.env` file in the root directory
+   - Add your Firebase configuration as environment variables
+   - Never commit the `.env` file to version control
+
+4. **Firebase Rules**
+   - Keep your Firestore rules secure
+   - Regularly review and update security rules
+   - Test rules before deployment
+
+### Environment Variables
+
+Create a `.env` file in the root directory with the following structure:
+
+```env
+# Firebase Configuration
+VITE_FIREBASE_API_KEY=your_api_key
+VITE_FIREBASE_AUTH_DOMAIN=your_auth_domain
+VITE_FIREBASE_PROJECT_ID=your_project_id
+VITE_FIREBASE_STORAGE_BUCKET=your_storage_bucket
+VITE_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
+VITE_FIREBASE_APP_ID=your_app_id
+
+# Optional: Firebase Admin SDK (if needed)
+VITE_FIREBASE_ADMIN_PROJECT_ID=your_project_id
+VITE_FIREBASE_ADMIN_PRIVATE_KEY=your_private_key
+VITE_FIREBASE_ADMIN_CLIENT_EMAIL=your_client_email
+```
+
+### Security Best Practices
+
+1. **Environment Variables**
+   - Use environment variables for all sensitive data
+   - Never hardcode credentials in your code
+   - Keep your `.env` file secure and private
+
+2. **Firebase Rules**
+   - Implement strict security rules
+   - Use authentication checks
+   - Limit access to authorized users only
+
+3. **API Keys**
+   - Restrict API key usage in Firebase Console
+   - Use appropriate security rules
+   - Monitor API key usage
+
+4. **Deployment**
+   - Use secure deployment methods
+   - Keep deployment credentials private
+   - Regularly rotate credentials
+
+## 🔧 Firebase Setup Guide
+
+### 1. Create Firebase Configuration Files
+
+After cloning the repository, you need to create two essential files:
+
+1. **Create `src/firebase.js`**:
+```javascript
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+export const auth = getAuth(app);
+export const db = getFirestore(app);
+```
+
+2. **Create `firestore.rules`**:
+```javascript
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow read/write access to authenticated users
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+    
+    // Course collection rules
+    match /courses/{courseId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+    
+    // Session collection rules
+    match /sessions/{sessionId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+  }
+}
+```
+
+### 2. Set Up Environment Variables
+
+1. Create a `.env` file in the root directory
+2. Add your Firebase configuration:
+```env
+VITE_FIREBASE_API_KEY=your_api_key
+VITE_FIREBASE_AUTH_DOMAIN=your_auth_domain
+VITE_FIREBASE_PROJECT_ID=your_project_id
+VITE_FIREBASE_STORAGE_BUCKET=your_storage_bucket
+VITE_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
+VITE_FIREBASE_APP_ID=your_app_id
+```
+
+### 3. Get Firebase Configuration
+
+1. Go to [Firebase Console](https://console.firebase.google.com)
+2. Create a new project or select an existing one
+3. Click on the gear icon (⚙️) next to "Project Overview"
+4. Select "Project settings"
+5. Scroll down to "Your apps" section
+6. Click on the web app icon (</>)
+7. Register your app with a nickname
+8. Copy the configuration object
+9. Use these values in your `.env` file
+
+### 4. Deploy Firestore Rules
+
+1. Install Firebase CLI:
+```bash
+npm install -g firebase-tools
+```
+
+2. Login to Firebase:
+```bash
+firebase login
+```
+
+3. Initialize Firebase in your project:
+```bash
+firebase init
+```
+
+4. Deploy rules:
+```bash
+firebase deploy --only firestore:rules
+```
+
+### 5. Verify Setup
+
+1. Start the development server:
+```bash
+npm run dev
+```
+
+2. Check the browser console for any Firebase-related errors
+3. Try to sign in to verify authentication is working
+4. Test database operations to ensure Firestore is properly configured

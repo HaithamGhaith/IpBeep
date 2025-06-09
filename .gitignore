@@ -46,3 +46,24 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Firebase
+firebase-debug.log
+firebase-debug.*.log
+.firebase/
+firebase.json
+firestore.rules
+firebase.js
+firebase.config.js
+firebase-key.json
+firebase-credentials.json
+firebase-admin.json
+firebase-admin-key.json
+firebase-service-account.json
+firebase-service-account-key.json
+firebase-credentials.json
+firebase-credentials-key.json
+firebase-credentials-admin.json
+firebase-credentials-admin-key.json
+firebase-credentials-service.json
+firebase-credentials-service-key.json
