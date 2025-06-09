@@ -56,6 +56,13 @@ src/
 
 ## 🚀 Getting Started
 
+### Prerequisites
+- Node.js (v16 or higher)
+- npm (v7 or higher)
+- Git
+
+### Installation
+
 1. **Clone the repository**
 ```bash
 git clone https://github.com/yourusername/IpBeep-Web.git
@@ -63,18 +70,67 @@ cd IpBeep-Web
 ```
 
 2. **Install dependencies**
+
+You can install dependencies using either npm or yarn:
+
+Using npm:
 ```bash
+# Install all dependencies
 npm install
+
+# Or install dependencies from requirements.txt
+npm install $(cat requirements.txt | grep -v '^#' | cut -d= -f1)
+```
+
+Using yarn:
+```bash
+# Install all dependencies
+yarn install
+
+# Or install dependencies from requirements.txt
+yarn add $(cat requirements.txt | grep -v '^#' | cut -d= -f1)
 ```
 
 3. **Configure Firebase**
-- Create a Firebase project
+- Create a Firebase project at [Firebase Console](https://console.firebase.google.com)
 - Enable Authentication and Firestore
-- Add your Firebase configuration to `.env`
+- Create a new file `.env` in the root directory
+- Add your Firebase configuration:
+```env
+VITE_FIREBASE_API_KEY=your_api_key
+VITE_FIREBASE_AUTH_DOMAIN=your_auth_domain
+VITE_FIREBASE_PROJECT_ID=your_project_id
+VITE_FIREBASE_STORAGE_BUCKET=your_storage_bucket
+VITE_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
+VITE_FIREBASE_APP_ID=your_app_id
+```
 
 4. **Start development server**
 ```bash
 npm run dev
+# or
+yarn dev
+```
+
+The application will be available at `http://localhost:5173`
+
+### Development Scripts
+
+```bash
+# Start development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
+
+# Run linting
+npm run lint
+
+# Deploy to GitHub Pages
+npm run deploy
 ```
 
 ## 🔄 Integration with Raspberry Pi
