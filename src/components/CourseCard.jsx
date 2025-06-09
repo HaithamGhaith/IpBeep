@@ -1,167 +1,300 @@
-import React, { useState, useEffect } from 'react';
-import { useTheme } from '../context/ThemeContext';
-import { db } from '../firebase';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import React, { useState, useEffect } from "react";
+import { useTheme } from "../context/ThemeContext";
+import { db } from "../firebase";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { motion } from "framer-motion";
+import Tilt from "react-parallax-tilt";
 
-const CourseCard = ({ courseId }) => {
+const CourseCard = ({ courseId, isSelected, onClick, isHovered }) => {
   const { colors } = useTheme();
   const [fetchedCourseData, setFetchedCourseData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [noData, setNoData] = useState(false);
 
   useEffect(() => {
-    const fetchCourseDetails = async () => {
+    const fetchCourseData = async () => {
       setLoading(true);
       setNoData(false);
       setFetchedCourseData(null);
 
       try {
+        const sessionsRef = collection(db, "FlatDesign");
         const q = query(
-          collection(db, 'FlatDesign'),
-          where('course_id', '==', courseId.toUpperCase()) // Ensure matching case
+          sessionsRef,
+          where("course_id", "==", courseId.toUpperCase())
         );
         const querySnapshot = await getDocs(q);
 
         if (querySnapshot.empty) {
-          console.log(`No documents found for course_id: ${courseId}`);
           setNoData(true);
           setLoading(false);
           return;
         }
 
-        let totalStudents = new Set();
-        let sessionAttendancePercentages = []; // Array to store attendance percentage for each session
-        let uniqueSessions = new Set();
-        let thresholdSum = 0;
-        let thresholdEntriesCount = 0;
+        const sessions = querySnapshot.docs.map((doc) => doc.data());
+        const totalRegisteredStudents = new Set();
+        let totalThresholdSum = 0;
+        let totalThresholdCount = 0;
+        let totalAttended = 0;
+        let totalSessions = sessions.length;
 
-        querySnapshot.forEach((doc) => {
-          const data = doc.data();
-          console.log('Processing document data:', data);
+        sessions.forEach((session) => {
+          if (session.students && typeof session.students === "object") {
+            Object.entries(session.students).forEach(
+              ([studentId, studentData]) => {
+                totalRegisteredStudents.add(studentId);
 
-          // Check if 'students' map exists and is an object
-          if (data.students && typeof data.students === 'object') {
-            const sessionStudents = Object.keys(data.students);
-            let sessionAttendedCount = 0;
+                // Add threshold to sum if it exists and is a number
+                if (
+                  studentData.threshold &&
+                  typeof studentData.threshold === "number"
+                ) {
+                  totalThresholdSum += studentData.threshold;
+                  totalThresholdCount++;
+                }
 
-            sessionStudents.forEach(studentIdKey => {
-              totalStudents.add(studentIdKey);
-              
-              // Check attendance from the nested map
-              if (data.students[studentIdKey] && data.students[studentIdKey].attended === true) {
-                sessionAttendedCount++;
+                if (studentData.attended === true) {
+                  totalAttended++;
+                }
               }
-
-              // Accumulate threshold from nested student map
-              const studentThreshold = data.students[studentIdKey].threshold;
-              if (typeof studentThreshold === 'number') {
-                thresholdSum += studentThreshold;
-                thresholdEntriesCount++;
-              }
-            });
-
-            // Calculate attendance percentage for this session
-            if (sessionStudents.length > 0) {
-              const sessionAttendancePercentage = (sessionAttendedCount / sessionStudents.length) * 100;
-              sessionAttendancePercentages.push(sessionAttendancePercentage);
-              console.log(`Session ${data.session_id} attendance: ${sessionAttendancePercentage.toFixed(0)}%`);
-            }
-          }
-
-          // Continue processing session_id as it seems to be top-level
-          if (data.session_id) {
-            uniqueSessions.add(data.session_id);
+            );
           }
         });
 
-        const totalRegisteredStudents = totalStudents.size;
-        const sectionsCount = uniqueSessions.size;
-        const avgClassDuration = thresholdEntriesCount > 0 
-          ? (thresholdSum / thresholdEntriesCount).toFixed(0) 
-          : 0;
+        // Calculate average threshold only if we have valid threshold values
+        const avgClassDuration =
+          totalThresholdCount > 0
+            ? Math.round(totalThresholdSum / totalThresholdCount)
+            : 0;
 
-        // Calculate average attendance percentage across all sessions
-        const avgAttendedPercentage = sessionAttendancePercentages.length > 0
-          ? (sessionAttendancePercentages.reduce((sum, percentage) => sum + percentage, 0) / sessionAttendancePercentages.length).toFixed(0)
-          : 0;
-
-        console.log('Session attendance percentages:', sessionAttendancePercentages);
-        console.log('Average attendance percentage:', avgAttendedPercentage);
+        const avgAttendedPercentage =
+          totalSessions > 0 && totalRegisteredStudents.size > 0
+            ? Math.round(
+                (totalAttended /
+                  (totalRegisteredStudents.size * totalSessions)) *
+                  100
+              )
+            : 0;
 
         setFetchedCourseData({
-          totalRegisteredStudents,
-          avgAttendedPercentage,
-          sectionsCount,
+          totalRegisteredStudents: totalRegisteredStudents.size,
+          sectionsCount: totalSessions,
           avgClassDuration,
+          avgAttendedPercentage,
         });
       } catch (error) {
-        console.error('Error fetching course details:', error);
+        console.error("Error fetching course data:", error);
         setNoData(true);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchCourseDetails();
-  }, [courseId]); // Re-run when courseId changes
+    fetchCourseData();
+  }, [courseId]);
 
   return (
-    <div style={{
-      fontFamily: "'Outfit', sans-serif",
-      color: colors.text,
-    }}>
-      <h3 style={{
-        fontFamily: "'Outfit', sans-serif",
-        fontWeight: 600,
-        fontSize: '1.2rem',
-        marginBottom: '16px',
-        color: colors.text,
-      }}>
-        {courseId}
-      </h3>
-      {loading && (
-        <div style={{ color: colors.textSecondary, textAlign: 'center', padding: '20px' }}>
-          Loading course data...
-        </div>
-      )}
-      {(noData || !fetchedCourseData) && !loading && (
-        <div style={{ color: colors.textSecondary, textAlign: 'center', padding: '20px' }}>
-          No classes started yet for this course.
-        </div>
-      )}
-      {fetchedCourseData && !loading && (
-        <table style={{
-          width: '100%',
-          borderCollapse: 'collapse',
-          marginTop: '16px',
-        }}>
-          <tbody>
-            <tr style={{
-              borderBottom: `1px solid ${colors.border}`,
-            }}>
-              <td style={{ padding: '8px 0', fontWeight: 500, color: colors.textSecondary }}>Total Registered Students:</td>
-              <td style={{ padding: '8px 0', textAlign: 'right', color: colors.text }}>{fetchedCourseData.totalRegisteredStudents}</td>
-            </tr>
-            <tr style={{
-              borderBottom: `1px solid ${colors.border}`,
-            }}>
-              <td style={{ padding: '8px 0', fontWeight: 500, color: colors.textSecondary }}>Number of Given Sessions:</td>
-              <td style={{ padding: '8px 0', textAlign: 'right', color: colors.text }}>{fetchedCourseData.sectionsCount}</td>
-            </tr>
-            <tr style={{
-              borderBottom: `1px solid ${colors.border}`,
-            }}>
-              <td style={{ padding: '8px 0', fontWeight: 500, color: colors.textSecondary }}>Avg Class Duration:</td>
-              <td style={{ padding: '8px 0', textAlign: 'right', color: colors.text }}>{fetchedCourseData.avgClassDuration} mins</td>
-            </tr>
-            <tr>
-              <td style={{ padding: '8px 0', fontWeight: 500, color: colors.textSecondary }}>Avg Attended Students (%):</td>
-              <td style={{ padding: '8px 0', textAlign: 'right', color: colors.text }}>{fetchedCourseData.avgAttendedPercentage}%</td>
-            </tr>
-          </tbody>
-        </table>
-      )}
-    </div>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.3 }}
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
+    >
+      <Tilt
+        tiltMaxAngleX={5}
+        tiltMaxAngleY={5}
+        perspective={1000}
+        glareEnable={true}
+        glareMaxOpacity={0.1}
+        glareColor="#1a237e"
+        glarePosition="all"
+        glareBorderRadius="16px"
+      >
+        <motion.div
+          style={{
+            backgroundColor: isSelected ? "#f5f7ff" : "#ffffff",
+            borderRadius: "16px",
+            boxShadow: isHovered
+              ? "0 8px 30px rgba(0,0,0,0.1)"
+              : isSelected
+              ? "0 4px 25px rgba(0,0,0,0.1)"
+              : "0 4px 20px rgba(0,0,0,0.05)",
+            padding: "24px",
+            cursor: "pointer",
+            border: isSelected ? "3px solid #1a237e" : "1px solid transparent",
+            transform: isHovered ? "translateY(-5px)" : "translateY(0)",
+            transition: "all 0.3s ease-in-out",
+          }}
+          onClick={onClick}
+        >
+          <motion.h3
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            style={{
+              color: "#1a237e",
+              fontSize: "1.5rem",
+              fontWeight: 600,
+              margin: 0,
+              fontFamily: "'Outfit', sans-serif",
+            }}
+          >
+            {courseId}
+          </motion.h3>
+
+          {loading && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              style={{
+                color: colors.textSecondary,
+                textAlign: "center",
+                padding: "20px",
+              }}
+            >
+              Loading course data...
+            </motion.div>
+          )}
+
+          {(noData || !fetchedCourseData) && !loading && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              style={{
+                color: colors.textSecondary,
+                textAlign: "center",
+                padding: "20px",
+              }}
+            >
+              No classes started yet for this course.
+            </motion.div>
+          )}
+
+          {fetchedCourseData && !loading && (
+            <motion.table
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              style={{
+                width: "100%",
+                borderCollapse: "collapse",
+                marginTop: "16px",
+              }}
+            >
+              <tbody>
+                <motion.tr
+                  initial={{ x: -20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: 0.4 }}
+                  style={{
+                    borderBottom: `1px solid ${colors.border}`,
+                  }}
+                >
+                  <td
+                    style={{
+                      padding: "8px 0",
+                      fontWeight: 500,
+                      color: colors.textSecondary,
+                    }}
+                  >
+                    Total Registered Students:
+                  </td>
+                  <td
+                    style={{
+                      padding: "8px 0",
+                      textAlign: "right",
+                      color: colors.text,
+                    }}
+                  >
+                    {fetchedCourseData.totalRegisteredStudents}
+                  </td>
+                </motion.tr>
+                <motion.tr
+                  initial={{ x: -20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: 0.5 }}
+                  style={{
+                    borderBottom: `1px solid ${colors.border}`,
+                  }}
+                >
+                  <td
+                    style={{
+                      padding: "8px 0",
+                      fontWeight: 500,
+                      color: colors.textSecondary,
+                    }}
+                  >
+                    Number of Given Sessions:
+                  </td>
+                  <td
+                    style={{
+                      padding: "8px 0",
+                      textAlign: "right",
+                      color: colors.text,
+                    }}
+                  >
+                    {fetchedCourseData.sectionsCount}
+                  </td>
+                </motion.tr>
+                <motion.tr
+                  initial={{ x: -20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: 0.6 }}
+                  style={{
+                    borderBottom: `1px solid ${colors.border}`,
+                  }}
+                >
+                  <td
+                    style={{
+                      padding: "8px 0",
+                      fontWeight: 500,
+                      color: colors.textSecondary,
+                    }}
+                  >
+                    Avg Class Duration:
+                  </td>
+                  <td
+                    style={{
+                      padding: "8px 0",
+                      textAlign: "right",
+                      color: colors.text,
+                    }}
+                  >
+                    {fetchedCourseData.avgClassDuration} mins
+                  </td>
+                </motion.tr>
+                <motion.tr
+                  initial={{ x: -20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: 0.7 }}
+                >
+                  <td
+                    style={{
+                      padding: "8px 0",
+                      fontWeight: 500,
+                      color: colors.textSecondary,
+                    }}
+                  >
+                    Avg Attended Students (%):
+                  </td>
+                  <td
+                    style={{
+                      padding: "8px 0",
+                      textAlign: "right",
+                      color: colors.text,
+                    }}
+                  >
+                    {fetchedCourseData.avgAttendedPercentage}%
+                  </td>
+                </motion.tr>
+              </tbody>
+            </motion.table>
+          )}
+        </motion.div>
+      </Tilt>
+    </motion.div>
   );
 };
 

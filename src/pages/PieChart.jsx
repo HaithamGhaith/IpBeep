@@ -1,23 +1,18 @@
-import React from 'react';
-import {
-  Chart as ChartJS,
-  ArcElement,
-  Tooltip,
-  Legend
-} from 'chart.js';
-import { Pie } from 'react-chartjs-2';
+import React from "react";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import { Pie } from "react-chartjs-2";
 
 // Register required chart.js components
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 function PieChart({ attended, absent }) {
   const data = {
-    labels: ['Attended', 'Absent'],
+    labels: ["Attended", "Absent"],
     datasets: [
       {
-        label: 'Attendance',
+        label: "Attendance",
         data: [attended, absent],
-        backgroundColor: ['#4CAF50', '#FF5252'],
+        backgroundColor: ["#008000", "#FF0000"],
       },
     ],
   };
@@ -26,13 +21,13 @@ function PieChart({ attended, absent }) {
     responsive: true,
     plugins: {
       legend: {
-        position: 'bottom',
+        position: "bottom",
       },
     },
   };
 
   return (
-    <div style={{ width: '100%', height: '100%' }}>
+    <div style={{ width: "100%", height: "100%" }}>
       <Pie data={data} options={options} />
     </div>
   );

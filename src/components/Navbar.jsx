@@ -1,130 +1,191 @@
 import React from "react";
-import SettingsIcon from "@mui/icons-material/Settings";
-import LogoutIcon from "@mui/icons-material/Logout";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { motion } from "framer-motion";
 import { useTheme } from "../context/ThemeContext";
-import SettingsButton from "./SettingsButton";
+import { logout } from "../services/authService";
+import { auth } from "../firebase";
 
-const iconButtonStyle = {
-  backgroundColor: "#f5f7ff",
-  borderRadius: "12px",
-  border: "none",
-  padding: 8,
-  margin: 0,
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  cursor: "pointer",
-  transition: "all 0.2s ease-in-out",
-  color: "#1a237e",
-};
-
-const Navbar = ({ course, section, isCoursesPage, isRunningSessionPage }) => {
-  const navigate = useNavigate();
+const Navbar = () => {
   const { colors } = useTheme();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const user = auth.currentUser;
 
-  const navbarTitle = isRunningSessionPage
-    ? ` - Running Session ${course ? course.toUpperCase() : ""}`
-    : isCoursesPage
-    ? " - Current Courses"
-    : course && section
-    ? ` - ${course.toUpperCase()} Session ${section} Report`
-    : " - Dashboard - Report";
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate("/");
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
+
+  const handleLogoClick = () => {
+    if (user) {
+      navigate("/courses");
+    } else {
+      navigate("/");
+    }
+  };
+
+  const isCoursesPage = location.pathname === "/courses";
+  const isRunningSessionPage = location.pathname === "/running-session";
+  const isDashboardPage = location.pathname === "/dashboard";
+  const isHelpPage = location.pathname === "/help";
+
+  const getPageTitle = () => {
+    if (isRunningSessionPage) return " - Running Session";
+    if (isCoursesPage) return " - Current Courses";
+    if (isDashboardPage) return " - Dashboard";
+    if (isHelpPage) return " - Help";
+    return "";
+  };
 
   return (
-    <header
+    <motion.header
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{
+        duration: 0.4,
+        ease: "easeOut",
+      }}
       style={{
-        backgroundColor: colors.cardBackground,
-        boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
-        borderBottom: "1px solid #e0e0e0",
-        width: "100%",
-        zIndex: 1201,
-        position: "fixed",
+        background: "linear-gradient(to right, #1a237e, #283593)",
+        padding: "1rem 2rem",
+        boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+        position: "sticky",
         top: 0,
-        left: 0,
+        zIndex: 1000,
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        backdropFilter: "blur(10px)",
+        borderBottom: "1px solid rgba(255,255,255,0.1)",
       }}
     >
       <div
         style={{
-          maxWidth: 1280,
+          maxWidth: "1280px",
+          width: "100%",
           margin: "0 auto",
-          padding: "0 24px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
         }}
       >
-        <div
+        <motion.div
           style={{
             display: "flex",
             alignItems: "center",
-            justifyContent: "space-between",
-            minHeight: 70,
-            padding: 0,
+            gap: "1rem",
+            cursor: "pointer",
           }}
+          onClick={handleLogoClick}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            <img
-              src="/IpBeep/IPBeep.png"
-              alt="IPBeep Logo"
-              style={{ height: "40px", width: "auto", marginRight: 10 }}
-            />
-            <span
+          <motion.img
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+            src="/IpBeep/IPBeep_White.png"
+            alt="IPBeep Logo"
+            style={{
+              height: "45px",
+              width: "auto",
+              filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.2))",
+            }}
+          />
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.4 }}
+          >
+            <motion.h1
               style={{
-                color: "#1a237e",
-                fontSize: "1.25rem",
+                color: "#ffffff",
+                margin: 0,
+                fontSize: "1.75rem",
                 fontWeight: 700,
                 fontFamily: "'Outfit', sans-serif",
-                letterSpacing: 1,
+                letterSpacing: "0.5px",
+                textShadow: "0 2px 4px rgba(0,0,0,0.1)",
               }}
             >
-              IPBeep{navbarTitle}
-            </span>
-          </div>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 16,
-            }}
-          >
-            <button
-              type="button"
-              style={iconButtonStyle}
-              onClick={() => navigate("/")}
-              onMouseOver={(e) =>
-                (e.currentTarget.style.backgroundColor = "#e8eaf6")
-              }
-              onMouseOut={(e) =>
-                (e.currentTarget.style.backgroundColor = "#f5f7ff")
-              }
-            >
-              <LogoutIcon style={{ color: "#1a237e" }} />
-            </button>
-            <SettingsButton />
-            <div
+              IPBeep{getPageTitle()}
+            </motion.h1>
+          </motion.div>
+        </motion.div>
+
+        <motion.div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "1.5rem",
+          }}
+        >
+          {!isCoursesPage && user && (
+            <motion.button
+              whileHover={{ scale: 1.05, backgroundColor: "#3949ab" }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => navigate("/courses")}
               style={{
-                width: 40,
-                height: 40,
-                borderRadius: "50%",
-                backgroundColor: "#e0e0e0",
+                backgroundColor: "#303f9f",
+                color: "white",
+                border: "none",
+                padding: "0.75rem 1.5rem",
+                borderRadius: "12px",
+                cursor: "pointer",
+                fontFamily: "'Outfit', sans-serif",
+                fontSize: "0.95rem",
+                fontWeight: 500,
                 display: "flex",
                 alignItems: "center",
-                justifyContent: "center",
-                cursor: "pointer",
-                transition: "all 0.2s ease-in-out",
+                gap: "0.75rem",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                transition: "all 0.3s ease",
               }}
-              onMouseOver={(e) =>
-                (e.currentTarget.style.backgroundColor = "#d0d0d0")
-              }
-              onMouseOut={(e) =>
-                (e.currentTarget.style.backgroundColor = "#e0e0e0")
-              }
             >
-              <AccountCircleIcon style={{ color: "#1a237e" }} />
-            </div>
-          </div>
-        </div>
+              <motion.span
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3, duration: 0.4 }}
+              >
+                ← Back to Courses
+              </motion.span>
+            </motion.button>
+          )}
+          {user && (
+            <motion.button
+              whileHover={{ scale: 1.05, backgroundColor: "#d32f2f" }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleLogout}
+              style={{
+                backgroundColor: "#c62828",
+                color: "white",
+                border: "none",
+                padding: "0.75rem 1.5rem",
+                borderRadius: "12px",
+                cursor: "pointer",
+                fontFamily: "'Outfit', sans-serif",
+                fontSize: "0.95rem",
+                fontWeight: 500,
+                boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                transition: "all 0.3s ease",
+              }}
+            >
+              <motion.span
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3, duration: 0.4 }}
+              >
+                Logout
+              </motion.span>
+            </motion.button>
+          )}
+        </motion.div>
       </div>
-    </header>
+    </motion.header>
   );
 };
 

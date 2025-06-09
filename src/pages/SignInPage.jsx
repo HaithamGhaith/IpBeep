@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useTheme } from "../context/ThemeContext";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
+import { motion } from "framer-motion";
+import Tilt from "react-parallax-tilt";
 // import IPBeepLogo from '/IPBeep.png'; // Import the logo image
 
 const SignInPage = () => {
@@ -48,7 +50,10 @@ const SignInPage = () => {
   const [isEmailHovered, setIsEmailHovered] = useState(false);
 
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
       style={{
         minHeight: "100vh",
         backgroundColor: colors.background,
@@ -60,135 +65,170 @@ const SignInPage = () => {
         padding: "24px",
       }}
     >
-      <div
-        style={{
-          backgroundColor: colors.cardBackground,
-          borderRadius: "16px",
-          boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
-          padding: "40px",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          maxWidth: "400px",
-          width: "100%",
-          textAlign: "center",
-        }}
+      <Tilt
+        tiltMaxAngleX={5}
+        tiltMaxAngleY={5}
+        perspective={1000}
+        glareEnable={true}
+        glareMaxOpacity={0.1}
+        glareColor="#1a237e"
+        glarePosition="all"
+        glareBorderRadius="16px"
       >
-        <img
-          src="/IpBeep/IPBeep.png"
-          alt="IPBeep Logo"
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.5 }}
           style={{
-            width: "200px",
-            height: "auto",
-            marginBottom: "20px",
-          }}
-        />
-        <h1
-          style={{
-            fontFamily: "'Outfit', sans-serif",
-            fontWeight: 700,
-            color: colors.text,
-            fontSize: "2rem",
-            marginBottom: "16px",
-            marginTop: 0,
+            backgroundColor: colors.cardBackground,
+            borderRadius: "16px",
+            boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
+            padding: "40px",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            maxWidth: "400px",
+            width: "100%",
+            textAlign: "center",
           }}
         >
-          Sign In
-        </h1>
-        <p
-          style={{
-            fontFamily: "'Outfit', sans-serif",
-            color: colors.textSecondary,
-            fontSize: "1rem",
-            marginBottom: "24px",
-          }}
-        >
-          Sign in with your credentials
-        </p>
-
-        {error && (
-          <div
+          <motion.img
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            src="/IpBeep/IPBeep_Blue.png"
+            alt="IPBeep Logo"
             style={{
-              color: "#dc3545",
-              backgroundColor: "rgba(220, 53, 69, 0.1)",
-              padding: "12px",
-              borderRadius: "8px",
-              marginBottom: "16px",
-              width: "100%",
-              fontSize: "0.9rem",
-            }}
-          >
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSignIn} style={{ width: "100%" }}>
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            style={{
-              margin: "0 auto",
-              width: "90%",
-              padding: "12px",
-              marginBottom: "16px",
-              border: `1px solid ${colors.border}`,
-              borderRadius: "8px",
-              fontFamily: "'Outfit', sans-serif",
-              fontSize: "1rem",
-              backgroundColor: colors.inputBackground,
-              color: colors.text,
-              outline: "none",
-              transition: "border-color 0.3s ease",
-              margin: "0 auto 16px auto",
+              width: "200px",
+              height: "auto",
+              marginBottom: "20px",
             }}
           />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
+          <motion.h1
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
             style={{
-              width: "90%",
-              padding: "12px",
+              fontFamily: "'Outfit', sans-serif",
+              fontWeight: 700,
+              color: colors.text,
+              fontSize: "2rem",
+              marginBottom: "16px",
+              marginTop: 0,
+            }}
+          >
+            Sign In
+          </motion.h1>
+          <motion.p
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            style={{
+              fontFamily: "'Outfit', sans-serif",
+              color: colors.textSecondary,
+              fontSize: "1rem",
               marginBottom: "24px",
-              border: `1px solid ${colors.border}`,
-              borderRadius: "8px",
-              fontFamily: "'Outfit', sans-serif",
-              fontSize: "1rem",
-              backgroundColor: colors.inputBackground,
-              color: colors.text,
-              outline: "none",
-              transition: "border-color 0.3s ease",
-              margin: "0 auto 24px auto",
-            }}
-          />
-          <button
-            type="submit"
-            disabled={isLoading}
-            style={{
-              width: "80%",
-              padding: "12px",
-              backgroundColor: isLoading ? "#6c757d" : "#1a237e",
-              color: "#fff",
-              border: "none",
-              borderRadius: "8px",
-              fontFamily: "'Outfit', sans-serif",
-              fontSize: "1rem",
-              fontWeight: 600,
-              cursor: isLoading ? "not-allowed" : "pointer",
-              transition: "background-color 0.3s ease",
-              opacity: isLoading ? 0.7 : 1,
             }}
           >
-            {isLoading ? "Signing in..." : "Sign In"}
-          </button>
-        </form>
-      </div>
-    </div>
+            Sign in with your credentials
+          </motion.p>
+
+          {error && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              style={{
+                color: "#dc3545",
+                backgroundColor: "rgba(220, 53, 69, 0.1)",
+                padding: "12px",
+                borderRadius: "8px",
+                marginBottom: "16px",
+                width: "100%",
+                fontSize: "0.9rem",
+              }}
+            >
+              {error}
+            </motion.div>
+          )}
+
+          <motion.form
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.5 }}
+            onSubmit={handleSignIn}
+            style={{ width: "100%" }}
+          >
+            <motion.input
+              whileFocus={{ scale: 1.02 }}
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              style={{
+                width: "90%",
+                padding: "12px",
+                marginBottom: "16px",
+                border: `1px solid ${colors.border}`,
+                borderRadius: "8px",
+                fontFamily: "'Outfit', sans-serif",
+                fontSize: "1rem",
+                backgroundColor: colors.inputBackground,
+                color: colors.text,
+                outline: "none",
+                transition: "all 0.3s ease",
+                margin: "0 auto 16px auto",
+              }}
+            />
+            <motion.input
+              whileFocus={{ scale: 1.02 }}
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              style={{
+                width: "90%",
+                padding: "12px",
+                marginBottom: "24px",
+                border: `1px solid ${colors.border}`,
+                borderRadius: "8px",
+                fontFamily: "'Outfit', sans-serif",
+                fontSize: "1rem",
+                backgroundColor: colors.inputBackground,
+                color: colors.text,
+                outline: "none",
+                transition: "all 0.3s ease",
+                margin: "0 auto 24px auto",
+              }}
+            />
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              type="submit"
+              disabled={isLoading}
+              style={{
+                width: "80%",
+                padding: "12px",
+                backgroundColor: isLoading ? "#6c757d" : "#1a237e",
+                color: "#fff",
+                border: "none",
+                borderRadius: "8px",
+                fontFamily: "'Outfit', sans-serif",
+                fontSize: "1rem",
+                fontWeight: 600,
+                cursor: isLoading ? "not-allowed" : "pointer",
+                transition: "all 0.3s ease",
+                opacity: isLoading ? 0.7 : 1,
+              }}
+            >
+              {isLoading ? "Signing in..." : "Sign In"}
+            </motion.button>
+          </motion.form>
+        </motion.div>
+      </Tilt>
+    </motion.div>
   );
 };
 
