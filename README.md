@@ -63,13 +63,15 @@ IpBeep is a modern web application that serves as the instructor's control panel
 
 ```
 src/
+├── assets/            # Static assets (images, etc.)
 ├── components/         # Reusable UI components
-├── pages/             # Page components
 ├── context/           # React context providers
-├── hooks/             # Custom React hooks
-├── utils/             # Utility functions
-├── assets/            # Static assets
-└── App.jsx           # Main application component
+├── firebase/          # Firebase configuration and initialization
+├── pages/             # Page components for different routes
+├── services/          # Business logic (auth, database queries)
+├── App.jsx            # Main application component with routing
+├── main.jsx           # Root React render entry point
+└── index.css          # Global styles
 ```
 
 ## 🚀 Getting Started
