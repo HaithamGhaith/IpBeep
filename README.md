@@ -1,5 +1,8 @@
 # 🌐 IpBeep - Smart Attendance System Web Interface
 
+> 🔌 This web dashboard works hand-in-hand with the [IpBeep Pi System](https://github.com/HaithamGhaith/IpBeep-PI-Side), which handles the Raspberry Pi hotspot, face recognition, and MAC tracking.
+
+
 IpBeep is a modern web application that serves as the instructor's control panel for managing smart attendance sessions. Built with React and Firebase, it provides a seamless interface for course management, session control, and attendance analytics.
 
 ## 📸 Screenshots
