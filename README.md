@@ -2,6 +2,24 @@
 
 IpBeep is a modern web application that serves as the instructor's control panel for managing smart attendance sessions. Built with React and Firebase, it provides a seamless interface for course management, session control, and attendance analytics.
 
+## 📸 Screenshots
+
+| Login Page | Courses Page |
+| :---: | :---: |
+| <img src="src/assets/Screenshots/1.png" alt="Login Page" width="400"/> | <img src="src/assets/Screenshots/2.png" alt="Courses Page" width="400"/> |
+
+| Running Session | Session Details |
+| :---: | :---: |
+| <img src="src/assets/Screenshots/3.png" alt="Running Session" width="400"/> | <img src="src/assets/Screenshots/4.png" alt="Session Details" width="400"/> |
+
+| Student Attendance | Help Page |
+| :---: | :---: |
+| <img src="src/assets/Screenshots/5.png" alt="Student Attendance" width="400"/> | <img src="src/assets/Screenshots/6.png" alt="Help Page" width="400"/> |
+
+| Modify Attendance | Network Info |
+| :---: | :---: |
+| <img src="src/assets/Screenshots/7.png" alt="Modify Attendance" width="400"/> | <img src="src/assets/Screenshots/8.png" alt="Network Info" width="400"/> |
+
 ## 🔧 Features
 
 ### 📚 Course Management
@@ -61,58 +79,45 @@ src/
 - npm (v7 or higher)
 - Git
 
-### Installation
+### Installation & Setup
 
-1. **Clone the repository**
-```bash
-git clone https://github.com/yourusername/IpBeep-Web.git
-cd IpBeep-Web
-```
+1.  **Clone the repository**
+    ```bash
+    git clone https://github.com/yourusername/IpBeep-Web.git
+    cd IpBeep-Web
+    ```
 
-2. **Install dependencies**
+2.  **Install dependencies**
+    ```bash
+    npm install
+    ```
 
-You can install dependencies using either npm or yarn:
+3.  **Configure Firebase**
+    - Go to the [Firebase Console](https://console.firebase.google.com) and create a new project.
+    - In your project settings, add a new web app.
+    - Copy the Firebase configuration object.
+    - Create a `.env.local` file in the root of your project.
+    - Add your Firebase credentials to the `.env.local` file like this:
+      ```env
+      VITE_FIREBASE_API_KEY=your_api_key
+      VITE_FIREBASE_AUTH_DOMAIN=your_auth_domain
+      VITE_FIREBASE_PROJECT_ID=your_project_id
+      VITE_FIREBASE_STORAGE_BUCKET=your_storage_bucket
+      VITE_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
+      VITE_FIREBASE_APP_ID=your_app_id
+      ```
+    - **Important:** The `.env.local` file is already in your `.gitignore` to prevent you from accidentally committing your secret keys.
 
-Using npm:
-```bash
-# Install all dependencies
-npm install
+4.  **Set up Firestore and Rules**
+    - In the Firebase Console, go to the "Firestore Database" section and create a new database.
+    - Go to the "Rules" tab and paste the contents of the `firestore.rules` file from this repository.
+    - Deploy the rules using the Firebase CLI if you have it installed (`firebase deploy --only firestore:rules`).
 
-# Or install dependencies from requirements.txt
-npm install $(cat requirements.txt | grep -v '^#' | cut -d= -f1)
-```
-
-Using yarn:
-```bash
-# Install all dependencies
-yarn install
-
-# Or install dependencies from requirements.txt
-yarn add $(cat requirements.txt | grep -v '^#' | cut -d= -f1)
-```
-
-3. **Configure Firebase**
-- Create a Firebase project at [Firebase Console](https://console.firebase.google.com)
-- Enable Authentication and Firestore
-- Create a new file `.env` in the root directory
-- Add your Firebase configuration:
-```env
-VITE_FIREBASE_API_KEY=your_api_key
-VITE_FIREBASE_AUTH_DOMAIN=your_auth_domain
-VITE_FIREBASE_PROJECT_ID=your_project_id
-VITE_FIREBASE_STORAGE_BUCKET=your_storage_bucket
-VITE_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
-VITE_FIREBASE_APP_ID=your_app_id
-```
-
-4. **Start development server**
-```bash
-npm run dev
-# or
-yarn dev
-```
-
-The application will be available at `http://localhost:5173`
+5.  **Start the development server**
+    ```bash
+    npm run dev
+    ```
+    The application will be available at `http://localhost:5173`.
 
 ### Development Scripts
 
